@@ -1,0 +1,144 @@
+English Query,Flink SQL Query,Schema
+count orders placed in last 48 hours,"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where cast($rowtime as timestamp) > cast(current_timestamp - interval '48' hour as timestamp)","CREATE TABLE `rahul-env`.`cluster_0`.`order` ( key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+count orders placed since march 30 2024,"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where cast($rowtime as timestamp) > cast('2024-03-30' as timestamp)","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+count orders placed by customer named 'John Doe',"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where customer.name = 'John Doe'","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+count orders placed by customer living in 'New York',"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where customer.address.city = 'New York'","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+count orders placed by customer living in 'New York' and placed in last 48 hours,"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where customer.address.city = 'New York' and cast($rowtime as timestamp) > cast(current_timestamp - interval '48' hour as timestamp)","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+count orders placed by customer living in 'New York' and placed since march 30 2024,"select count(*) as order_count from `rahul-env`.`cluster_0`.`order` where customer.address.city = 'New York' and cast($rowtime as timestamp) > cast('2024-03-30' as timestamp)","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+calculate sum of quantity of orders grouped by window start and end with tumbling window of 10 minutes,"select window_start, window_end, sum(quantity) as total_quantity from table( tumble(table `rahul-env`.`cluster_0`.`order`, descriptor($rowtime), interval '10' minute) ) group by window_start, window_end","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
+calculate sum of quantity of orders grouped by window start and end with hoping window of 10 minutes and slide of 5 minutes,"select window_start, window_end, sum(quantity) as total_quantity from table( hop(table `rahul-env`.`cluster_0`.`order`, descriptor($rowtime), interval '5' minute, interval '10' minute) ) group by window_start, window_end","CREATE TABLE `rahul-env`.`cluster_0`.`order` (
+key VARBINARY(2147483647),
+product VARCHAR(2147483647) NOT NULL,
+quantity INT NOT NULL,
+customer ROW<name VARCHAR(2147483647) NOT NULL, address ROW<state VARCHAR(2147483647) NOT NULL, city VARCHAR(2147483647) NOT NULL> NOT NULL> NOT NULL
+) DISTRIBUTED BY HASH(key) INTO 1 BUCKETS
+WITH (
+'changelog.mode' = 'append',
+'connector' = 'confluent',
+'kafka.cleanup-policy' = 'delete',
+'kafka.max-message-size' = '2097164 bytes',
+'kafka.retention.size' = '0 bytes',
+'kafka.retention.time' = '7 d',
+'key.format' = 'raw',
+'scan.bounded.mode' = 'unbounded',
+'scan.startup.mode' = 'earliest-offset',
+'value.format' = 'avro-registry'
+)"
